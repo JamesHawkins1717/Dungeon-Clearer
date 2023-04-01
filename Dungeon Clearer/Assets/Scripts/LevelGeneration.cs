@@ -12,11 +12,15 @@ public class LevelGeneration : MonoBehaviour
     public GameObject room5; // f, l, r
     public GameObject room6; // l, r
 
+    public GameObject wall;
+
     public GameObject player;
 
     private GameObject[] rooms;
     private List<Vector3> endPoints; // Y is direction, 0 is f, 1 is r, 2 is b, 3 is l
     private List<Vector3> placedPos;
+    private List<int> placedPosDirection;
+    
 
     // Start is called before the first frame update
     void Start()
@@ -24,28 +28,39 @@ public class LevelGeneration : MonoBehaviour
         rooms = new GameObject[] { corridor, room1, room2, room3, room4, room5, room6 };
         endPoints = new List<Vector3>();
         placedPos = new List<Vector3>();
+        placedPosDirection = new List<int>();
 
-        Instantiate(corridor, new Vector3(0,0,0), Quaternion.identity);
-        endPoints.Add(new Vector3(0,0,15));
+        Instantiate(corridor, new Vector3(0, 0, 0), Quaternion.identity);
+        endPoints.Add(new Vector3(0, 0, 15));
+        placedPos.Add(new Vector3(0, 0, 0));
+        placedPosDirection.Add(0);
+        Instantiate(wall, new Vector3(0, 0, -15), Quaternion.Euler(0, 0, 0));
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        List<int> endPointsToRemove = new List<int>();
-
         for (int i = 0; i < endPoints.Count; i++)
         {
-            if (isPlayerClose(endPoints[i]) && isPosNotUsed(endPoints[i]))
+            int direction = (int)endPoints[i].y;
+
+            if (isPlayerClose(endPoints[i]) && isPosNotUsed(endPoints[i], direction, i))
             {
                 int room = 0;
-                int direction = (int)endPoints[i].y;
+                if (Random.Range(0, 101) <= 59) { room = 1; }
+
                 Vector3 newPos = endPoints[i];
 
                 bool end = false;
+                bool loopCountCheck = false;
+                int loopCounter = 0;
                 while (end == false)
                 {
-                    if (Random.Range(0, 2) == 1) { room = Random.Range(0, rooms.Length); }
+                    if (room == 1 || loopCountCheck) 
+                    {
+                        if (Random.Range(0, 101) <= 70) { room = Random.Range(0, rooms.Length); }
+                    }
+                    
 
                     switch (direction) // Check if room is valid with direction
                     {
@@ -62,6 +77,10 @@ public class LevelGeneration : MonoBehaviour
                             if (room == 0 || room == 3 || room == 4 || room == 5 || room == 6) { end = true; }
                             break;
                     }
+
+                    if (loopCounter == 15) { room = 0; break; }
+
+                    loopCountCheck = true;
                 }
 
                 
@@ -71,10 +90,10 @@ public class LevelGeneration : MonoBehaviour
                 }
                 else { Instantiate(rooms[room], new Vector3(newPos.x, 0, newPos.z), rooms[room].transform.rotation); Debug.Log("Room Num: " + room); } // Create new room
 
-                placedPos.Add(new Vector3(newPos.x, 0, newPos.z));
+                placedPos.Add(new Vector3(newPos.x, room, newPos.z));
+                placedPosDirection.Add(direction);
 
-                endPointsToRemove.Add(i);
-
+                endPoints[i] = new Vector3(endPoints[i].x, 30, endPoints[i].z);
 
 
                 switch (room) // Create new endPoints
@@ -128,9 +147,9 @@ public class LevelGeneration : MonoBehaviour
             }
         }
 
-        for (int i = 0; i < endPointsToRemove.Count; i++)
+        for (int i = 0; i < endPoints.Count; i++)
         {
-            endPoints.RemoveAt(endPointsToRemove[i]);
+            if (endPoints[i].y == 30) { endPoints.RemoveAt(i); }
         }
 
     }
@@ -142,11 +161,59 @@ public class LevelGeneration : MonoBehaviour
         else { return false; }
     }
 
-    private bool isPosNotUsed(Vector3 newPos)
+    private bool isPosNotUsed(Vector3 newPos, int direction, int arrayPos)
     {
         for (int i = 0; i < placedPos.Count; i++)
         {
-            if (placedPos[i].x == newPos.x && placedPos[i].z == newPos.z) { return false; }
+            if (placedPos[i].x == newPos.x && placedPos[i].z == newPos.z) 
+            {
+                if (placedPos[i].y == 0)
+                {
+                    bool createWall = true;
+
+                    switch (placedPosDirection[i])
+                    {
+                        case 0:
+                            if (direction == 2) { createWall = false; }
+                            break;
+                        case 1:
+                            if (direction == 3) { createWall = false; }
+                            break;
+                        case 2:
+                            if (direction == 0) { createWall = false; }
+                            break;
+                        case 3:
+                            if (direction == 1) { createWall = false; }
+                            break;
+                    }
+
+                    if (createWall)
+                    {
+                        float rotation = 0; // Create Wall
+                        switch (direction)
+                        {
+                            case 0:
+                                rotation = 180;
+                                break;
+                            case 1:
+                                rotation = 270;
+                                break;
+                            case 2:
+                                rotation = 0;
+                                break;
+                            case 3:
+                                rotation = 90;
+                                break;
+                        }
+
+                        Instantiate(wall, new Vector3(newPos.x, 0, newPos.z), Quaternion.Euler(0, rotation, 0));
+                    }
+                }
+                
+                endPoints[arrayPos] = new Vector3(endPoints[arrayPos].x, 30, endPoints[arrayPos].z);
+
+                return false;
+            }
         }
 
         return true;

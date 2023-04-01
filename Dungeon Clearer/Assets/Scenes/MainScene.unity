@@ -174,6 +174,7 @@ MonoBehaviour:
   room4: {fileID: 454996513498401656, guid: 124570afba79ae84f9b95f60dea52bed, type: 3}
   room5: {fileID: 4452788976834256685, guid: f213a25e40503c1459db380f206d9569, type: 3}
   room6: {fileID: 1884460139650100692, guid: 2a5b960209a45ec498366751e0216d64, type: 3}
+  wall: {fileID: 1316157467385485677, guid: 55bd2e5fab21a33448efdd15ba5b4e27, type: 3}
   player: {fileID: 212934907}
 --- !u!1 &212934907 stripped
 GameObject:
@@ -459,9 +460,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 629156792, guid: b1cc94d26cd016d479aa5b522d88da0a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1885862585, guid: b1cc94d26cd016d479aa5b522d88da0a, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114472432562717340, guid: b1cc94d26cd016d479aa5b522d88da0a, type: 3}
+      propertyPath: runSpeed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114472432562717340, guid: b1cc94d26cd016d479aa5b522d88da0a, type: 3}
+      propertyPath: walkAccel
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 114472432562717340, guid: b1cc94d26cd016d479aa5b522d88da0a, type: 3}
+      propertyPath: walkSpeed
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7517427521858630766, guid: b1cc94d26cd016d479aa5b522d88da0a, type: 3}
       propertyPath: m_Enabled
